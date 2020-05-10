@@ -39,7 +39,7 @@ namespace NSE.Catalogo.API.Data.Repository
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            _context.Dispose();
         }
     }
 }
