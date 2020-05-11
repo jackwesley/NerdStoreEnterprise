@@ -2,8 +2,9 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using NSE.WebAPI.Core.Identidade;
 
-namespace NSE.Identidade.API.Extensions
+namespace NSE.Identidade.API.Configuration
 {
     public static class ApiConfig
     {
@@ -26,7 +27,8 @@ namespace NSE.Identidade.API.Extensions
 
             app.UseRouting();
 
-            app.UseIdentityConfiguration();
+            //Auth configuration deve ficar entre o UseRouting e UseEndpoints
+            app.UseAuthConfiguration();
 
             app.UseEndpoints(endpoints =>
             {

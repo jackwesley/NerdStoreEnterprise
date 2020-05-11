@@ -33,6 +33,7 @@ namespace NSE.WebApp.MVC.Configuration
 
             app.UseRouting();
 
+            //Authentication configuration deve ficar entre o UseRouting e UseEndpoints
             app.UseIdentityConfiguration();
 
             app.UseMiddleware<ExceptionMiddleware>();
