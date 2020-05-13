@@ -66,7 +66,7 @@ namespace NSE.WebApp.MVC.Configuration
                   Console.ForegroundColor = ConsoleColor.White;
               });
 
-            return retryWaitPolicy;
+            return retry;
         }
     }
 }
