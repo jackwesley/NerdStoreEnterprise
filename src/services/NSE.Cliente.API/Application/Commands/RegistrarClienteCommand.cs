@@ -1,9 +1,6 @@
 ﻿using NSE.Core.DomainObjects;
 using NSE.Core.Messages;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace NSE.Cliente.API.Application.Commands
 {
@@ -11,10 +8,10 @@ namespace NSE.Cliente.API.Application.Commands
     {
         public Guid Id { get; set; }
         public string Nome { get; set; }
-        public Email Email { get; set; }
-        public Cpf Cpf { get; set; }
+        public string Email { get; set; }
+        public string Cpf { get; set; }
 
-        public RegistrarClienteCommand(Guid id, string nome, Email email, Cpf cpf)
+        public RegistrarClienteCommand(Guid id, string nome, string email, string cpf)
         {
             AgregateId = id;
             Id = id;
@@ -22,7 +19,5 @@ namespace NSE.Cliente.API.Application.Commands
             Email = email;
             Cpf = cpf;
         }
-
-
     }
 }
