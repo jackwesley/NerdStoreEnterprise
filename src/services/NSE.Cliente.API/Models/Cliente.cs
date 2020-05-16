@@ -1,6 +1,7 @@
 ﻿using NSE.Core.DomainObjects;
 using System;
 
+
 namespace NSE.Cliente.API.Models
 {
     public class Cliente : Entity, IAggregateRoot
@@ -8,7 +9,7 @@ namespace NSE.Cliente.API.Models
         public Cliente(Guid id, string name, string email, string cpf)
         {
             Id = id;
-            Name = name;
+            Nome = name;
             Email = new Email(email);
             Cpf = new Cpf(cpf);
             Excluido = false;
@@ -18,7 +19,7 @@ namespace NSE.Cliente.API.Models
         //Entity Framework(EF) Relation
         protected Cliente() { }
 
-        public string Name { get; private set; }
+        public string Nome { get; private set; }
         public Email Email { get; private set; }
         public Cpf Cpf { get; private set; }
         public bool Excluido { get; private set; }
