@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 
-namespace NSE.Cliente.API.Application.Commands
+namespace NSE.Cliente.API.Configuration
 {
     public static class SwaggerConfig
     {
