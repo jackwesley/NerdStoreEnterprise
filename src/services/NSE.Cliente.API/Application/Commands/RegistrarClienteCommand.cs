@@ -2,7 +2,7 @@
 using NSE.Core.DomainObjects;
 using NSE.Core.Messages;
 using System;
-using System.IO.Pipelines;
+
 
 namespace NSE.Cliente.API.Application.Commands
 {
