@@ -18,7 +18,7 @@ namespace NSE.WebApp.MVC.Controllers
 
         [HttpGet]
         [Route("")]
-        [Route("itrine")]
+        [Route("vitrine")]
         public async Task<IActionResult> Index()
         {
             var produtos = await _catalogoService.ObterTodos();
