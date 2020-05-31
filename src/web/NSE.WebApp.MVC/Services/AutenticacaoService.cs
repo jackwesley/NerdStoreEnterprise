@@ -27,7 +27,7 @@ namespace NSE.WebApp.MVC.Services
                 requestUri: "/api/identidade/autenticar",
                 loginContent);
 
-            if (!TratarErroResponse(response))
+            if (!TratarErrosResponse(response))
             {
                 return new UsuarioRespostaLogin
                 {
@@ -46,7 +46,7 @@ namespace NSE.WebApp.MVC.Services
                 requestUri: "/api/identidade/nova-conta",
                 registroContent);
 
-            if (!TratarErroResponse(response))
+            if (!TratarErrosResponse(response))
             {
                 return new UsuarioRespostaLogin
                 {

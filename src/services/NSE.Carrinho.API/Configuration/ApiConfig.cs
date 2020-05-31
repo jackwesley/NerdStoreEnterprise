@@ -14,7 +14,6 @@ namespace NSE.Carrinho.API.Configuration
     {
         public static void AddApiConfiguration(this IServiceCollection services, IConfiguration configuration)
         {
-
             services.AddDbContext<CarrinhoContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
@@ -22,12 +21,12 @@ namespace NSE.Carrinho.API.Configuration
 
             services.AddCors(options =>
             {
-                options.AddPolicy(name: "Total",
-                    configurePolicy: builder =>
-                    builder
-                        .AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader());
+                options.AddPolicy("Total",
+                    builder =>
+                        builder
+                            .AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader());
             });
         }
 
@@ -44,7 +43,6 @@ namespace NSE.Carrinho.API.Configuration
 
             app.UseCors("Total");
 
-            //Auth configuration deve ficar entre o UseRouting e UseEndpoints
             app.UseAuthConfiguration();
 
             app.UseEndpoints(endpoints =>

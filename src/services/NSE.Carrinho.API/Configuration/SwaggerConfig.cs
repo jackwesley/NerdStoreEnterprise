@@ -2,9 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace NSE.Carrinho.API.Configuration
 {
@@ -14,15 +12,15 @@ namespace NSE.Carrinho.API.Configuration
         {
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc(name: "v1", new OpenApiInfo()
+                c.SwaggerDoc("v1", new OpenApiInfo()
                 {
                     Title = "NerdStore Enterprise Carrinho API",
-                    Description = "Esta API faz parte do conjunto de APIs da NerdStore Eneterprise",
-                    Contact = new OpenApiContact() { Name = "Jack Wesley Moreira", Email = "jackwesley@hotmail.com" },
-                    License = new OpenApiLicense() { Name = "MIT", Url = new Uri(uriString: "https://opensourse.org/licences") }
+                    Description = "Esta API faz parte do conjunto de APIs da NERD STORE Enterprise.",
+                    Contact = new OpenApiContact() { Name = "Jack Wesley", Email = "jackwesley@hotmail.com" },
+                    License = new OpenApiLicense() { Name = "MIT", Url = new Uri("https://opensource.org/licenses/MIT") }
                 });
 
-                c.AddSecurityDefinition(name: "Bearer", new OpenApiSecurityScheme
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "Insira o token JWT desta maneira: Bearer {seu token}",
                     Name = "Authorization",
@@ -43,9 +41,10 @@ namespace NSE.Carrinho.API.Configuration
                                 Id = "Bearer"
                             }
                         },
-                        new string[] { }
+                        new string[] {}
                     }
                 });
+
             });
         }
 
@@ -54,7 +53,7 @@ namespace NSE.Carrinho.API.Configuration
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint(url: "/swagger/v1/swagger.json", name: "v1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
             });
         }
     }
