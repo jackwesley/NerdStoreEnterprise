@@ -13,8 +13,8 @@ namespace NSE.WebApp.MVC.Services
 
         public CarrinhoService(HttpClient httpClient, IOptions<AppSettings> settings)
         {
+            httpClient.BaseAddress = new Uri(settings.Value.CarrinhoUrl);
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri(settings.Value.CarrinhoUrl);
         }
 
         public async Task<CarrinhoViewModel> ObterCarrinho()
