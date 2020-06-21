@@ -20,7 +20,7 @@ namespace NSE.Bff.Compras.Services
         public CatalogoService(HttpClient httpClient, IOptions<AppServicesSettings> settings)
         {
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new System.Uri(settings.Value.CarrinhoUrl);
+            _httpClient.BaseAddress = new System.Uri(settings.Value.CatalogoUrl);
         }
 
         public async Task<ItemProdutoDTO> ObterPorId(Guid id)
