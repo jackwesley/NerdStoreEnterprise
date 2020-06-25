@@ -2,18 +2,19 @@
 using System.Threading.Tasks;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore;
-using NSE.Cliente.API.Models;
 using NSE.Core.Data;
 using NSE.Core.DomainObjects;
 using NSE.Core.Mediator;
 using NSE.Core.Messages;
+using NSE.Pedidos.Domain.Voucher;
 
-namespace NSE.Cliente.API.Data
+namespace NSE.Pedidos.Infra.Data
 {
-    public class ClientesContext : DbContext, IUnitOfWork
+    public class PedidosContext : DbContext, IUnitOfWork
     {
         private readonly IMediatorHandler _mediatorHandler;
-        public ClientesContext(DbContextOptions<ClientesContext> options, IMediatorHandler mediatorHandler)
+
+        public PedidosContext(DbContextOptions<PedidosContext> options, IMediatorHandler mediatorHandler)
             : base(options)
         {
             _mediatorHandler = mediatorHandler;
@@ -21,22 +22,20 @@ namespace NSE.Cliente.API.Data
             ChangeTracker.AutoDetectChangesEnabled = false;
         }
 
-        public DbSet<Models.Cliente> Clientes { get; set; }
-        public DbSet<Endereco> Enderecos { get; set; }
+        public DbSet<Voucher> Vouchers { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-            modelBuilder.Ignore<ValidationResult>();
-            modelBuilder.Ignore<Event>();
 
             foreach (var property in modelBuilder.Model.GetEntityTypes().SelectMany(
                 e => e.GetProperties().Where(p => p.ClrType == typeof(string))))
                 property.SetColumnType(value: "varchar(100)");
 
-            foreach (var relationship in modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys())) relationship.DeleteBehavior = DeleteBehavior.ClientSetNull;
+            modelBuilder.Ignore<ValidationResult>();
+            modelBuilder.Ignore<Event>();
 
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ClientesContext).Assembly);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(PedidosContext).Assembly);
         }
 
 
