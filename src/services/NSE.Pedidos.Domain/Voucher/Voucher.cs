@@ -1,11 +1,13 @@
-﻿using NSE.Core.DomainObjects;
+﻿using FluentValidation.Validators;
+using NSE.Core.DomainObjects;
+using NSE.Pedidos.Domain.Voucher.Specs;
 using System;
 
 namespace NSE.Pedidos.Domain.Voucher
 {
     public class Voucher : Entity, IAggregateRoot
     {
-        public string  Codigo { get; private set; }
+        public string Codigo { get; private set; }
         public decimal? Percentual { get; private set; }
         public decimal? ValorDesconto { get; private set; }
         public int Quantidade { get; private set; }
@@ -15,5 +17,20 @@ namespace NSE.Pedidos.Domain.Voucher
         public DateTime DataValidade { get; private set; }
         public bool Ativo { get; private set; }
         public bool Utilizado { get; private set; }
+
+        public bool EstaValidoParaUtilizacao()
+        {
+            return new VoucherAtivoSpecification()
+                   .And(new VoucherDataSpecification())
+                   .And(new VoucherQuantidadeSpecification())
+                   .IsSatisfiedBy(this);
+        }
+
+        public void MarcarComoUtilizado()
+        {
+            Ativo = false;
+            Utilizado = true;
+            Quantidade = 0;
+        }
     }
 }
