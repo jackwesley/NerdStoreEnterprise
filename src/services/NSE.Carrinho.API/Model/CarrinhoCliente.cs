@@ -37,6 +37,7 @@ namespace NSE.Carrinho.API.Model
             VoucherUtilizado = true;
             CalcularValorCarrinho();
         }
+
         internal void CalcularValorCarrinho()
         {
             ValorTotal = Itens.Sum(p => p.CalcularValor());

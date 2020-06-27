@@ -7,6 +7,7 @@ namespace NSE.Pedidos.Domain.Voucher
 {
     public class Voucher : Entity, IAggregateRoot
     {
+
         public string Codigo { get; private set; }
         public decimal? Percentual { get; private set; }
         public decimal? ValorDesconto { get; private set; }

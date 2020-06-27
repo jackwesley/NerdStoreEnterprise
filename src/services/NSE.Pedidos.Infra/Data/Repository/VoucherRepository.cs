@@ -2,9 +2,6 @@
 using NSE.Core.Data;
 using NSE.Pedidos.Domain.Voucher;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NSE.Pedidos.Infra.Data.Repository
@@ -22,7 +19,9 @@ namespace NSE.Pedidos.Infra.Data.Repository
 
         public async Task<Voucher> ObterVoucherPorCodigo(string codigo)
         {
-            return await _context.Vouchers.FirstOrDefaultAsync(p => p.Codigo == codigo);
+
+            var voucherCodigo = await _context.Vouchers.FirstOrDefaultAsync(p => p.Codigo == codigo);
+            return voucherCodigo;
         }
 
         public void Dispose()
