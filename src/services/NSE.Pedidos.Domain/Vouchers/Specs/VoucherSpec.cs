@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 
-namespace NSE.Pedidos.Domain.Voucher.Specs
+namespace NSE.Pedidos.Domain.Vouchers.Specs
 {
     public class VoucherDataSpecification : Specification<Voucher>
     {
