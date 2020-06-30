@@ -1,4 +1,4 @@
-﻿using NetDevPack.Domain;
+﻿using NSE.Core.DomainObjects;
 using NSE.Pedidos.Domain.Vouchers;
 using System;
 using System.Collections.Generic;

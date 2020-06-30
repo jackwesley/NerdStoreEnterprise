@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using NSE.Core.Mediator;
 using NSE.Pedido.API.Application.Queries;
-using NSE.Pedidos.Domain.Voucher;
+using NSE.Pedidos.Domain.Vouchers;
 using NSE.Pedidos.Infra.Data;
 using NSE.Pedidos.Infra.Data.Repository;
 using NSE.WebAPI.Core.Usuario;

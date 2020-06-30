@@ -8,7 +8,7 @@ namespace NSE.Pedidos.Domain.Pedidos
         public PedidoItem(Guid produtoId, string produtoName, int quantidade, decimal valorUnitario, string produtoImagem)
         {
             ProdutoId = produtoId;
-            ProdutoName = produtoName;
+            ProdutoNome = produtoName;
             Quantidade = quantidade;
             ValorUnitario = valorUnitario;
             ProdutoImagem = produtoImagem;
@@ -19,7 +19,7 @@ namespace NSE.Pedidos.Domain.Pedidos
 
         public Guid PedidoId { get; set; }
         public Guid ProdutoId { get; set; }
-        public string ProdutoName { get; set; }
+        public string ProdutoNome { get; set; }
         public int Quantidade { get; set; }
         public decimal ValorUnitario { get; set; }
         public string ProdutoImagem { get; set; }

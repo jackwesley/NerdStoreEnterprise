@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NSE.Core.Data;
-using NSE.Pedidos.Domain.Voucher;
+using NSE.Pedidos.Domain.Vouchers;
 using System;
 using System.Threading.Tasks;
 

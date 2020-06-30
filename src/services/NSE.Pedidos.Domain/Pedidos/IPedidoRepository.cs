@@ -1,12 +1,11 @@
-﻿using NetDevPack.Data;
+﻿using NSE.Core.Data;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace NSE.Pedidos.Domain.Pedidos
 {
-    public interface IPedidosRepository : IRepository<Pedido>
+    public interface IPedidoRepository : IRepository<Pedido>
     {
         Task<Pedido> ObterPorId(Guid id);
         Task<IEnumerable<Pedido>> ObterListaPorClienteId(Guid clientId);
@@ -15,6 +14,6 @@ namespace NSE.Pedidos.Domain.Pedidos
 
         /*Pedido Item*/
         Task<PedidoItem> ObterItemPorId(Guid id);
-        Task<PedidoItem> ObnterItemPorPedido(Guid pedidoId, Guid produtoId);
+        Task<PedidoItem> ObterItemPorPedido(Guid pedidoId, Guid produtoId);
     }
 }

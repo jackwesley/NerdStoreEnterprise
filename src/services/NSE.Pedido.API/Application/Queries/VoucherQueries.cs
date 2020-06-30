@@ -1,5 +1,5 @@
 ﻿using NSE.Pedido.API.Application.DTO;
-using NSE.Pedidos.Domain.Voucher;
+using NSE.Pedidos.Domain.Vouchers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
