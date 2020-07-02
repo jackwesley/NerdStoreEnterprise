@@ -23,13 +23,16 @@ namespace NSE.Pedidos.Infra.Data.Repository
             var voucherCodigo = await _context.Vouchers.FirstOrDefaultAsync(p => p.Codigo == codigo);
             return voucherCodigo;
         }
+        public void Atualizar(Voucher voucher)
+        {
+            _context.Vouchers.Update(voucher);
+        }
 
         public void Dispose()
         {
             _context.Dispose();
         }
 
-
-
+        
     }
 }

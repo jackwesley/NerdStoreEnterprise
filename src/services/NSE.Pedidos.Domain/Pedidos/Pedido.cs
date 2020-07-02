@@ -9,7 +9,7 @@ namespace NSE.Pedidos.Domain.Pedidos
     public class Pedido : Entity, IAggregateRoot
     {
         public Pedido(Guid clienteId, decimal valorTotal, List<PedidoItem> pedidoItems,
-            decimal desconto = 0, bool voucherUtilizado = false, Guid? voucherId = null)
+            bool voucherUtilizado = false, decimal desconto = 0, Guid? voucherId = null)
         {
             ClienteId = clienteId;
             ValorTotal = valorTotal;
@@ -54,7 +54,12 @@ namespace NSE.Pedidos.Domain.Pedidos
             Voucher = voucher;
         }
 
-        internal void CalcularPedido()
+        public void AtribuirEndereco(Endereco endereco)
+        {
+            Endereco = endereco;
+        }
+
+        public void CalcularValorPedido()
         {
             ValorTotal = PedidoItems.Sum(p => p.CalcularValor());
             CalcularValorTotalDesconto();
