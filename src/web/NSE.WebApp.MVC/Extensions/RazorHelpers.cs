@@ -1,7 +1,6 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc.Razor;
 
 namespace NSE.WebApp.MVC.Extensions
@@ -28,12 +27,22 @@ namespace NSE.WebApp.MVC.Extensions
 
         public static string FormatoMoeda(this RazorPage page, decimal valor)
         {
-            return valor > 0 ? string.Format(Thread.CurrentThread.CurrentCulture, "{0:C}", valor) : "Gratuito";
+            return FormatoMoeda(valor);
+        }
+
+        private static string FormatoMoeda(decimal valor)
+        {
+            return string.Format(Thread.CurrentThread.CurrentCulture, "{0:C}", valor);
         }
 
         public static string UnidadesPorProduto(this RazorPage page, int unidades)
         {
             return unidades > 1 ? $"{unidades} unidades" : $"{unidades} unidade";
+        }
+
+        public static string UnidadesPorProdutoValorTotal(this RazorPage page, int unidades, decimal valor)
+        {
+            return $"{unidades}x {FormatoMoeda(valor)} = Total: {FormatoMoeda(valor * unidades)}";
         }
 
         public static string SelectOptionsPorQuantidade(this RazorPage page, int quantidade, int valorSelecionado = 0)

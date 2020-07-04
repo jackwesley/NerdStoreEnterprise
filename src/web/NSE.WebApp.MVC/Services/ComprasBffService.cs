@@ -16,6 +16,9 @@ namespace NSE.WebApp.MVC.Services
         Task<ResponseResult> AtualizarItemCarrinho(Guid produtoId, ItemCarrinhoViewModel produto);
         Task<ResponseResult> RemoverItemCarrinho(Guid produtoId);
         Task<ResponseResult> AplicarVoucherCarrinho(string voucher);
+
+        //Pedido
+        PedidoTransacaoViewModel MapearParaPedido(CarrinhoViewModel carrinho, EnderecoViewModel endereco);
     }
 
     public class ComprasBffService : Service, IComprasBffService
@@ -86,6 +89,34 @@ namespace NSE.WebApp.MVC.Services
             if (!TratarErrosResponse(response)) return await DeserializarObjetoResponse<ResponseResult>(response);
 
             return RetornoOk();
+        }
+
+        public PedidoTransacaoViewModel MapearParaPedido(CarrinhoViewModel carrinho, EnderecoViewModel endereco)
+        {
+            var pedido = new PedidoTransacaoViewModel
+            {
+                ValorTotal = carrinho.ValorTotal,
+                Desconto = carrinho.Desconto,
+                VoucherUtilizado = carrinho.VoucherUtilizado,
+                VoucherCodigo = carrinho.Voucher?.Codigo
+            };
+
+            if (endereco != null)
+            {
+                pedido.Endereco = new EnderecoViewModel
+                {
+                    Logradouro = endereco.Logradouro,
+                    Bairro = endereco.Bairro,
+                    Cep = endereco.Cep,
+                    Cidade = endereco.Cidade,
+                    ClienteId = endereco.ClienteId,
+                    Complemento = endereco.Complemento,
+                    Estado = endereco.Estado,
+                    Numero = endereco.Numero
+                };
+            }
+
+            return pedido;
         }
     }
 }
