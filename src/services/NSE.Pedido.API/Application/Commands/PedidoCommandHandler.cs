@@ -1,4 +1,7 @@
-﻿using FluentValidation.Results;
+﻿using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using FluentValidation.Results;
 using MediatR;
 using NSE.Core.Messages;
 using NSE.Pedido.API.Application.DTO;
@@ -6,10 +9,6 @@ using NSE.Pedido.API.Application.Events;
 using NSE.Pedidos.Domain.Pedidos;
 using NSE.Pedidos.Domain.Vouchers;
 using NSE.Pedidos.Domain.Vouchers.Specs;
-using NSE.Pedidos.Infra.Data.Repository;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NSE.Pedido.API.Application.Commands
 {
@@ -59,13 +58,13 @@ namespace NSE.Pedido.API.Application.Commands
         {
             var endereco = new Endereco
             {
-                Logradouro = message.Enderedo.Logradouro,
-                Numero = message.Enderedo.Numero,
-                Complemento = message.Enderedo.Complemento,
-                Bairro = message.Enderedo.Bairro,
-                Cep = message.Enderedo.Cep,
-                Cidade = message.Enderedo.Cidade,
-                Estado = message.Enderedo.Estado
+                Logradouro = message.Endereco.Logradouro,
+                Numero = message.Endereco.Numero,
+                Complemento = message.Endereco.Complemento,
+                Bairro = message.Endereco.Bairro,
+                Cep = message.Endereco.Cep,
+                Cidade = message.Endereco.Cidade,
+                Estado = message.Endereco.Estado
             };
 
             var pedido = new NSE.Pedidos.Domain.Pedidos.Pedido(message.ClienteId, message.ValorTotal, message.PedidoItems.Select(PedidoItemDTO.ParaPedidoItem).ToList(), message.VoucherUtilizado, message.Desconto);
@@ -98,7 +97,7 @@ namespace NSE.Pedido.API.Application.Commands
 
             _voucherRepository.Atualizar(voucher);
 
-            return false;
+            return true;
         }
 
         private bool ValidarPedido(NSE.Pedidos.Domain.Pedidos.Pedido pedido)

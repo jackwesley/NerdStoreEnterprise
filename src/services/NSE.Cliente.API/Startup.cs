@@ -24,6 +24,7 @@ namespace NSE.Cliente.API
             {
                 builder.AddUserSecrets<Startup>();
             }
+
             Configuration = builder.Build();
         }
 
@@ -39,6 +40,7 @@ namespace NSE.Cliente.API
             services.AddMediatR(typeof(Startup));
 
             services.RegisterServices();
+
             services.AddMessageBusConfiguration(Configuration);
         }
 

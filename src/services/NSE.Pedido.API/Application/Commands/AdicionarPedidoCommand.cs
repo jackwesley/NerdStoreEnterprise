@@ -21,7 +21,7 @@ namespace NSE.Pedido.API.Application.Commands
         public decimal Desconto { get; set; }
 
         //Endereco
-        public EnderecoDTO Enderedo { get; set; }
+        public EnderecoDTO Endereco { get; set; }
 
         //Cartao
         public string NumeroCartao { get; set; }

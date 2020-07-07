@@ -15,5 +15,10 @@ namespace NSE.WebApp.MVC.Models
         public string Cidade { get; set; }
         public string Estado { get; set; }
         public Guid ClienteId { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Logradouro}, {Numero} {Complemento} - {Bairro} - {Cidade} - {Estado}";
+        }
     }
 }
