@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using FluentValidation.Results;
 using MediatR;
 using NSE.Core.Messages;
+using NSE.Core.Messages.Integration;
+using NSE.MessageBus;
 using NSE.Pedido.API.Application.DTO;
 using NSE.Pedido.API.Application.Events;
 using NSE.Pedidos.Domain.Pedidos;
@@ -17,11 +19,13 @@ namespace NSE.Pedido.API.Application.Commands
 
         private readonly IVoucherRepository _voucherRepository;
         private readonly IPedidoRepository _pedidoRepository;
+        private readonly IMessageBus _bus;
 
-        public PedidoCommandHandler(IVoucherRepository voucherRepository, IPedidoRepository pedidoRepository)
+        public PedidoCommandHandler(IVoucherRepository voucherRepository, IPedidoRepository pedidoRepository, IMessageBus bus)
         {
             _voucherRepository = voucherRepository;
             _pedidoRepository = pedidoRepository;
+            _bus = bus;
         }
 
         public async Task<ValidationResult> Handle(AdicionarPedidoCommand message, CancellationToken cancellationToken)
@@ -39,7 +43,7 @@ namespace NSE.Pedido.API.Application.Commands
             if (!ValidarPedido(pedido)) return ValidationResult;
 
             //Processar pagamento
-            if (!ProcessarPagamento(pedido)) return ValidationResult;
+            if (!await ProcessarPagamento(pedido, message)) return ValidationResult;
 
             //Se pagamento tudo ok
             pedido.AutorizarPedido();
@@ -79,7 +83,7 @@ namespace NSE.Pedido.API.Application.Commands
             if (!message.VoucherUtilizado) return true;
 
             var voucher = await _voucherRepository.ObterVoucherPorCodigo(message.VoucherCodigo);
-            if(voucher == null)
+            if (voucher == null)
             {
                 AdicionarErro("O voucher informado não existe!");
                 return false;
@@ -107,13 +111,13 @@ namespace NSE.Pedido.API.Application.Commands
 
             pedido.CalcularValorPedido();
 
-            if(pedido.ValorTotal != pedidoValorOriginal)
+            if (pedido.ValorTotal != pedidoValorOriginal)
             {
                 AdicionarErro("O valor total do pedido nao confere com o cálculo do pedido");
                 return false;
             }
 
-            if(pedido.Desconto != pedidoDesconto)
+            if (pedido.Desconto != pedidoDesconto)
             {
                 AdicionarErro("O valor total não confere com o cálculo do pedido");
                 return false;
@@ -122,10 +126,33 @@ namespace NSE.Pedido.API.Application.Commands
             return true;
         }
 
-
-        public bool ProcessarPagamento(NSE.Pedidos.Domain.Pedidos.Pedido pedido)
+        public async Task<bool> ProcessarPagamento(NSE.Pedidos.Domain.Pedidos.Pedido pedido,
+            AdicionarPedidoCommand message)
         {
-            return true;
+            var pedidoIniciado = new PedidoIniciadoIntegrationEvent
+            {
+                PedidoId = pedido.Id,
+                ClienteId = pedido.ClienteId,
+                Valor = pedido.ValorTotal,
+                TipoPagamento = 1,//Fixo alte
+                NomeCartao = message.NomeCartao,
+                NumeroCartao = message.NumeroCartao,
+                MesAnoVencimento = message.ExpiracaoCartao,
+                CVV = message.CvvCartao
+            };
+
+
+            var result = await _bus
+                .RequestAsync<PedidoIniciadoIntegrationEvent, ResponseMessage>(pedidoIniciado);
+
+            if (result.ValidationResult.IsValid) return true;
+
+            foreach (var erro in result.ValidationResult.Errors)
+            {
+                AdicionarErro(erro.ErrorMessage);
+            }
+
+            return false;
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using NSE.Core.Mediator;
+using NSE.Pagamento.API.Data;
+using NSE.Pagamento.API.Data.Repository;
+using NSE.Pagamento.API.Models;
 using NSE.WebAPI.Core.Usuario;
 
 
@@ -10,19 +12,14 @@ namespace NSE.Pagamento.API.Configuration
     {
         public static void RegisterServices(this IServiceCollection services)
         {
-            //API
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddScoped<IAspNetUser, AspNetUser>();
 
-            //Commands
-            
+            //services.AddScoped<IPagamentoService, PagamentoService>();
+            //services.AddScoped<IPagamentoFacade, PagamentoCartaoCreditoFacade>();
 
-            //Events
-            
-
-
-            //Application
-            services.AddScoped<IMediatorHandler, MediatorHandler>();
+            services.AddScoped<IPagamentoRepository, PagamentoRepository>();
+            services.AddScoped<PagamentosContext>();
 
         }
     }
