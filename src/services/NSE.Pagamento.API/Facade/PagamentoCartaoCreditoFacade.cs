@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
+using NSE.Core.Messages.Integration;
 using NSE.Pagamento.API.Models;
 using NSE.Pagamentos.NerdsPag;
 using System;
@@ -42,8 +43,6 @@ namespace NSE.Pagamento.API.Facade
 
             return ParaTransacao(await transacao.AuthorizeCardTransaction());
         }
-
-
         public static Transacao ParaTransacao(Transaction transaction)
         {
             return new Transacao
@@ -57,6 +56,38 @@ namespace NSE.Pagamento.API.Facade
                 DataTransacao = transaction.TransactionDate,
                 NSU = transaction.Nsu,
                 TID = transaction.Tid
+            };
+        }
+
+        public async Task<Transacao> CapturarPagamento(Transacao transacao)
+        {
+            var nerdsPagSvc = new NerdsPagService(_pagamentoConfig.DefaultApiKey, _pagamentoConfig.DefaultApiKey);
+
+            var transaction = ParaTransaction(transacao, nerdsPagSvc);
+
+            return ParaTransacao(await transaction.CaptureCardTransaction());
+        }
+
+        public async Task<Transacao> CancelarAutorizacao(Transacao transacao)
+        {
+            var nerdsPagSvc = new NerdsPagService(_pagamentoConfig.DefaultApiKey, _pagamentoConfig.DefaultApiKey);
+
+            var transaction = ParaTransaction(transacao, nerdsPagSvc);
+
+            return ParaTransacao(await transaction.CancelAuthorization());
+        }
+
+        private static Transaction ParaTransaction(Transacao transacao, NerdsPagService nerdsPagSvc)
+        {
+            return new Transaction(nerdsPagSvc)
+            {
+                Status = (TransactionStatus)transacao.Status,
+                Amount = transacao.ValorTotal,
+                CardBrand = transacao.BandeiraCartao,
+                AuthorizationCode = transacao.CodigoAutorizacao,
+                Cost = transacao.CustoTransacao,
+                Nsu = transacao.NSU,
+                Tid = transacao.TID
             };
         }
     }

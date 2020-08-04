@@ -1,9 +1,13 @@
-﻿using FluentValidation.Results;
+﻿using FluentValidation;
+using FluentValidation.Results;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Components.Forms;
+using NSE.Core.DomainObjects;
 using NSE.Core.Messages.Integration;
 using NSE.Pagamento.API.Facade;
 using NSE.Pagamento.API.Models;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace NSE.Pagamento.API.Services
@@ -25,7 +29,7 @@ namespace NSE.Pagamento.API.Services
 
             var validationResult = new ValidationResult();
 
-            if(transacao.Status != StatusTransacao.Autorizado)
+            if (transacao.Status != StatusTransacao.Autorizado)
             {
                 validationResult.Errors.Add(new ValidationFailure("Pagamento", "Pagamento recusado, entre em contato com a sua operadora de cartão"));
                 return new ResponseMessage(validationResult);
@@ -34,13 +38,71 @@ namespace NSE.Pagamento.API.Services
             pagamento.AdicionarTransacao(transacao);
             _pagamentoRepository.AdicionarPagamento(pagamento);
 
-            if(!await _pagamentoRepository.UnitOfWork.Commit())
+            if (!await _pagamentoRepository.UnitOfWork.Commit())
             {
                 validationResult.Errors.Add(new ValidationFailure("Pagamento", "Houve um erro ao realizar o pagamento."));
 
                 //TODO: Comunicar com gateway para realizar o estorno
 
                 return new ResponseMessage(validationResult);
+            }
+
+            return new ResponseMessage(validationResult);
+        }
+
+        public async Task<ResponseMessage> CapturarPagamento(Guid pedidoId)
+        {
+            var transacoes = await _pagamentoRepository.ObterTransacoesPorPedidoId(pedidoId);
+            var transacaoAutorizada = transacoes?.FirstOrDefault(t => t.Status == StatusTransacao.Autorizado);
+            var validationResult = new ValidationResult();
+
+            if (transacaoAutorizada == null) throw new DomainException($"Transação não encontrada para o pedido {pedidoId}");
+
+            var transacao = await _pagamentoFacade.CapturarPagamento(transacaoAutorizada);
+
+            if (transacao.Status != StatusTransacao.Pago)
+            {
+                validationResult.Errors.Add(new ValidationFailure("Pagamento", $"Não foi possível capturar o pagamento do pedido {pedidoId}"));
+            }
+
+            transacao.PagamentoId = transacaoAutorizada.PagamentoId;
+            _pagamentoRepository.AdicionarTransacao(transacao);
+
+            if (!await _pagamentoRepository.UnitOfWork.Commit())
+            {
+                validationResult.Errors.Add(new ValidationFailure("Pagamento", $"Não foi possivel persisitr a captura do pagamento do pedido {pedidoId}"));
+
+                return new ResponseMessage(validationResult);
+
+            }
+
+            return new ResponseMessage(validationResult);
+        }
+
+        public async Task<ResponseMessage> CancelarPagamento(Guid pedidoId)
+        {
+            var transacoes = await _pagamentoRepository.ObterTransacoesPorPedidoId(pedidoId);
+            var transacaoAutorizada = transacoes?.FirstOrDefault(t => t.Status == StatusTransacao.Autorizado);
+            var validationResult = new ValidationResult();
+
+            if (transacaoAutorizada == null) throw new DomainException($"Transação não encontrada para o pedido {pedidoId}");
+
+            var transacaoCancelada = await _pagamentoFacade.CancelarAutorizacao(transacaoAutorizada);
+
+            if (transacaoCancelada.Status != StatusTransacao.Cancelado)
+            {
+                validationResult.Errors.Add(new ValidationFailure("Pagamento", $"Não foi possível capturar o pagamento do pedido {pedidoId}"));
+            }
+
+            transacaoCancelada.PagamentoId = transacaoAutorizada.PagamentoId;
+            _pagamentoRepository.AdicionarTransacao(transacaoCancelada);
+
+            if (!await _pagamentoRepository.UnitOfWork.Commit())
+            {
+                validationResult.Errors.Add(new ValidationFailure("Pagamento", $"Não foi cancelaro pedido: {pedidoId}"));
+
+                return new ResponseMessage(validationResult);
+
             }
 
             return new ResponseMessage(validationResult);

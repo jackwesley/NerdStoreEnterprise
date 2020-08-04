@@ -1,6 +1,6 @@
 ﻿using NSE.Core.DomainObjects;
 using System;
-
+using System.Runtime.InteropServices.WindowsRuntime;
 
 namespace NSE.Catalogo.API.Models
 {
@@ -12,6 +12,18 @@ namespace NSE.Catalogo.API.Models
         public decimal Valor { get; set; }
         public DateTime DataCadastro { get; set; }
         public string Imagem { get; set; }
-        public int  QuantidadeEstoque { get; set; }
+        public int QuantidadeEstoque { get; set; }
+
+
+        public void RetirarEstoque(int quantidade)
+        {
+            if (QuantidadeEstoque >= quantidade)
+                QuantidadeEstoque -= quantidade;
+        }
+
+        internal bool EstaDisponivel(int quantidade)
+        {
+            return Ativo && QuantidadeEstoque >= quantidade;
+        }
     }
 }

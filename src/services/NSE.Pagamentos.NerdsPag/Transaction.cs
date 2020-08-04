@@ -95,6 +95,41 @@ namespace NSE.Pagamentos.NerdsPag
             return Task.FromResult(transaction);
         }
 
+        public Task<Transaction> CaptureCardTransaction()
+        {
+            var transaction = new Transaction
+            {
+                AuthorizationCode = GetGenericCode(),
+                CardBrand = CardBrand,
+                Cost = 0,
+                Amount = Amount,
+                Status = TransactionStatus.Paid,
+                Tid = Tid,
+                Nsu = Nsu
+            };
+
+            return Task.FromResult(transaction);
+
+        }
+
+
+        public Task<Transaction> CancelAuthorization()
+        {
+            var transaction = new Transaction
+            {
+                AuthorizationCode = "",
+                CardBrand = CardBrand,
+                TransactionDate = DateTime.Now,
+                Cost = 0,
+                Amount = Amount,
+                Status = TransactionStatus.Cancelled,
+                Tid = Tid,
+                Nsu = Nsu
+            };
+
+            return Task.FromResult(transaction);
+        }
+
         private string GetGenericCode()
         {
             return new string(Enumerable.Repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789", 10)

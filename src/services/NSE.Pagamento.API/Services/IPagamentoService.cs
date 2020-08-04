@@ -9,5 +9,7 @@ namespace NSE.Pagamento.API.Services
     public interface IPagamentoService
     {
         Task<ResponseMessage> AutorizarPagamento(NSE.Pagamento.API.Models.Pagamento pagamento);
+        Task<ResponseMessage> CapturarPagamento(Guid pedidoId);
+        Task<ResponseMessage> CancelarPagamento(Guid pedidoId);
     }
 }

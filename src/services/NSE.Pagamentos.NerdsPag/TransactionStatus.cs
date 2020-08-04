@@ -7,6 +7,7 @@ namespace NSE.Pagamentos.NerdsPag
         Authorized = 1,
         Paid,
         Refused,
-        Chargedback
+        Chargedback,
+        Cancelled
     }
 }
