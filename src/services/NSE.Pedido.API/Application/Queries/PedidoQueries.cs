@@ -53,7 +53,7 @@ namespace NSE.Pedido.API.Application.Queries
         {
             const string sql = @"SELECT TOP 1
                                P.ID as 'PedidoId', P.ID, P.CLIENTEID, 
-                               PI.ID, as 'PedidoItemId', PI.ID, PI.PRODUTOID, PI.QUANTIDADE
+                               PI.ID as 'PedidoItemId', PI.ID, PI.PRODUTOID, PI.QUANTIDADE
                                FROM PEDIDOS P
                                INNER JOIN PEDIDOITEMS PI ON P.ID = PI.PEDIDOID
                                WHERE P.PEDIDOSTATUS =1
