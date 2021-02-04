@@ -19,60 +19,56 @@ namespace NSE.Identidade.API.Services
 {
     public class AuthenticationService
     {
-        public readonly SignInManager<IdentityUser> _signInManager;
-        public readonly UserManager<IdentityUser> _userManager;
+        public readonly SignInManager<IdentityUser> SignInManager;
+        public readonly UserManager<IdentityUser> UserManager;
         private readonly AppSettings _appSettings;
-        private readonly AppTokenSettings _appTokenSettings;
+        private readonly AppTokenSettings _appTokenSettingsSettings;
         private readonly ApplicationDbContext _context;
 
-        private readonly IAspNetUser _aspNetUser;
         private readonly IJsonWebKeySetService _jwksService;
+        private readonly IAspNetUser _aspNetUser;
 
-        public AuthenticationService(SignInManager<IdentityUser> signInManager,
+        public AuthenticationService(
+            SignInManager<IdentityUser> signInManager,
             UserManager<IdentityUser> userManager,
             IOptions<AppSettings> appSettings,
-            IOptions<AppTokenSettings> appTokenSettings,
-            IAspNetUser aspNetUser,
+            IOptions<AppTokenSettings> appTokenSettingsSettings,
+            ApplicationDbContext context,
             IJsonWebKeySetService jwksService,
-            ApplicationDbContext context)
+            IAspNetUser aspNetUser)
         {
-            _signInManager = signInManager;
-            _userManager = userManager;
+            SignInManager = signInManager;
+            UserManager = userManager;
             _appSettings = appSettings.Value;
-            _appTokenSettings = appTokenSettings.Value;
-            _aspNetUser = aspNetUser;
+            _appTokenSettingsSettings = appTokenSettingsSettings.Value;
             _jwksService = jwksService;
+            _aspNetUser = aspNetUser;
             _context = context;
         }
 
         public async Task<UsuarioRespostaLogin> GerarJwt(string email)
         {
-            var user = await _userManager.FindByEmailAsync(email);
-            var claims = await _userManager.GetClaimsAsync(user);
+            var user = await UserManager.FindByEmailAsync(email);
+            var claims = await UserManager.GetClaimsAsync(user);
 
             var identityClaims = await ObterClaimsUsuario(claims, user);
-            var encodeToken = CodificarToken(identityClaims);
+            var encodedToken = CodificarToken(identityClaims);
 
             var refreshToken = await GerarRefreshToken(email);
 
-            return ObterRespostaToken(encodeToken, user, claims, refreshToken);
+            return ObterRespostaToken(encodedToken, user, claims, refreshToken);
         }
 
-        public async Task<ClaimsIdentity> ObterClaimsUsuario(ICollection<Claim> claims, IdentityUser user)
+        private async Task<ClaimsIdentity> ObterClaimsUsuario(ICollection<Claim> claims, IdentityUser user)
         {
-            var userRoles = await _userManager.GetRolesAsync(user);
+            var userRoles = await UserManager.GetRolesAsync(user);
 
-            claims.Add(new Claim(JwtRegisteredClaimNames.Sub,
-               user.Id));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Email,
-                user.Email));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Jti,
-                Guid.NewGuid().ToString()));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf,
-                ToUnixEpochDate(DateTime.UtcNow).ToString()));
-            claims.Add(new Claim(JwtRegisteredClaimNames.Iat,
-                ToUnixEpochDate(DateTime.UtcNow).ToString(), ClaimValueTypes.Integer64));
-
+            claims.Add(new Claim(JwtRegisteredClaimNames.Sub, user.Id));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Email, user.Email));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Nbf, ToUnixEpochDate(DateTime.UtcNow).ToString()));
+            claims.Add(new Claim(JwtRegisteredClaimNames.Iat, ToUnixEpochDate(DateTime.UtcNow).ToString(),
+                ClaimValueTypes.Integer64));
             foreach (var userRole in userRoles)
             {
                 claims.Add(new Claim("role", userRole));
@@ -87,11 +83,9 @@ namespace NSE.Identidade.API.Services
         private string CodificarToken(ClaimsIdentity identityClaims)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-
-            var currentIssuer = $"{_aspNetUser.ObterHttpContext().Request.Scheme}://{_aspNetUser.ObterHttpContext().Request.Host}";
-
+            var currentIssuer =
+                $"{_aspNetUser.ObterHttpContext().Request.Scheme}://{_aspNetUser.ObterHttpContext().Request.Host}";
             var key = _jwksService.GetCurrent();
-
             var token = tokenHandler.CreateToken(new SecurityTokenDescriptor
             {
                 Issuer = currentIssuer,
@@ -103,7 +97,8 @@ namespace NSE.Identidade.API.Services
             return tokenHandler.WriteToken(token);
         }
 
-        private UsuarioRespostaLogin ObterRespostaToken(string encodedToken, IdentityUser user, IEnumerable<Claim> claims, RefreshToken refreshToken)
+        private UsuarioRespostaLogin ObterRespostaToken(string encodedToken, IdentityUser user,
+            IEnumerable<Claim> claims, RefreshToken refreshToken)
         {
             return new UsuarioRespostaLogin
             {
@@ -120,14 +115,15 @@ namespace NSE.Identidade.API.Services
         }
 
         private static long ToUnixEpochDate(DateTime date)
-            => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(year: 1970, month: 1, day: 1, hour: 0, minute: 0, second: 0, offset: TimeSpan.Zero)).TotalSeconds);
+            => (long)Math.Round((date.ToUniversalTime() - new DateTimeOffset(1970, 1, 1, 0, 0, 0, TimeSpan.Zero))
+                .TotalSeconds);
 
         private async Task<RefreshToken> GerarRefreshToken(string email)
         {
             var refreshToken = new RefreshToken
             {
                 Username = email,
-                ExpirationDate = DateTime.UtcNow.AddHours(_appTokenSettings.RefreshTokenExpiration)
+                ExpirationDate = DateTime.UtcNow.AddHours(_appTokenSettingsSettings.RefreshTokenExpiration)
             };
 
             _context.RefreshTokens.RemoveRange(_context.RefreshTokens.Where(u => u.Username == email));
@@ -141,7 +137,7 @@ namespace NSE.Identidade.API.Services
         public async Task<RefreshToken> ObterRefreshToken(Guid refreshToken)
         {
             var token = await _context.RefreshTokens.AsNoTracking()
-                .FirstOrDefaultAsync(u=> u.Token == refreshToken);
+                .FirstOrDefaultAsync(u => u.Token == refreshToken);
 
             return token != null && token.ExpirationDate.ToLocalTime() > DateTime.Now
                 ? token

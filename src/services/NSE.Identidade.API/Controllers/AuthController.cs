@@ -14,16 +14,14 @@ namespace NSE.Identidade.API.Controllers
     public class AuthController : MainController
     {
         private readonly AuthenticationService _authenticationService;
-
         private readonly IMessageBus _bus;
 
-        public AuthController(AuthenticationService authenticationService,
-                              IMessageBus bus
-                            )
+        public AuthController(
+            AuthenticationService authenticationService,
+            IMessageBus bus)
         {
             _authenticationService = authenticationService;
             _bus = bus;
-
         }
 
         [HttpPost("nova-conta")]
@@ -38,7 +36,7 @@ namespace NSE.Identidade.API.Controllers
                 EmailConfirmed = true
             };
 
-            var result = await _authenticationService._userManager.CreateAsync(user, usuarioRegistro.Senha);
+            var result = await _authenticationService.UserManager.CreateAsync(user, usuarioRegistro.Senha);
 
             if (result.Succeeded)
             {
@@ -46,7 +44,7 @@ namespace NSE.Identidade.API.Controllers
 
                 if (!clienteResult.ValidationResult.IsValid)
                 {
-                    await _authenticationService._userManager.DeleteAsync(user);
+                    await _authenticationService.UserManager.DeleteAsync(user);
                     return CustomResponse(clienteResult.ValidationResult);
                 }
 
@@ -66,7 +64,8 @@ namespace NSE.Identidade.API.Controllers
         {
             if (!ModelState.IsValid) return CustomResponse(ModelState);
 
-            var result = await _authenticationService._signInManager.PasswordSignInAsync(usuarioLogin.Email, usuarioLogin.Senha, false, true);
+            var result = await _authenticationService.SignInManager.PasswordSignInAsync(usuarioLogin.Email, usuarioLogin.Senha,
+                false, true);
 
             if (result.Succeeded)
             {
@@ -85,18 +84,23 @@ namespace NSE.Identidade.API.Controllers
 
         private async Task<ResponseMessage> RegistrarCliente(UsuarioRegistro usuarioRegistro)
         {
-            var usuario = await _authenticationService._userManager.FindByEmailAsync(usuarioRegistro.Email);
-            var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(Guid.Parse(usuario.Id), usuarioRegistro.Nome, usuarioRegistro.Email, usuarioRegistro.Cpf);
+            var usuario = await _authenticationService.UserManager.FindByEmailAsync(usuarioRegistro.Email);
+
+            var usuarioRegistrado = new UsuarioRegistradoIntegrationEvent(
+                Guid.Parse(usuario.Id), usuarioRegistro.Nome, usuarioRegistro.Email, usuarioRegistro.Cpf);
 
             try
             {
                 return await _bus.RequestAsync<UsuarioRegistradoIntegrationEvent, ResponseMessage>(usuarioRegistrado);
             }
-            catch
+            catch(Exception ex)
             {
-                await _authenticationService._userManager.DeleteAsync(usuario);
+                await _authenticationService.UserManager.DeleteAsync(usuario);
                 throw;
             }
+
+
+           
         }
 
         [HttpPost("refresh-token")]
@@ -104,15 +108,15 @@ namespace NSE.Identidade.API.Controllers
         {
             if (string.IsNullOrEmpty(refreshToken))
             {
-                AdicionarErroProcessamento("Refresh Token invalido");
+                AdicionarErroProcessamento("Refresh Token inválido");
                 return CustomResponse();
             }
 
             var token = await _authenticationService.ObterRefreshToken(Guid.Parse(refreshToken));
 
-            if(token is null)
+            if (token is null)
             {
-                AdicionarErroProcessamento("Refresh token expirado");
+                AdicionarErroProcessamento("Refresh Token expirado");
                 return CustomResponse();
             }
 

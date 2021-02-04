@@ -31,6 +31,7 @@ namespace NSE.Bff.Compras
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddApiConfiguration(Configuration);
+
             services.AddJwtConfiguration(Configuration);
 
             services.AddSwaggerConfiguration();
@@ -38,6 +39,8 @@ namespace NSE.Bff.Compras
             services.RegisterServices();
 
             services.AddMessageBusConfiguration(Configuration);
+
+            services.ConfigureGrpcServices(Configuration);
 
         }
 
